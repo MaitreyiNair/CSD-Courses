@@ -1,0 +1,104 @@
+//
+//  main.c
+//  Q4
+//
+//  Created by MAITREYI NAIR on 06/11/20.
+//
+
+
+
+// Code created by Maitreyi Nair
+// Date 27/10/20
+//Revised 07/11/2020
+
+#include <stdio.h>
+
+int maze[7][14] =
+{
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {0,0,0,0,0,0,1,0,0,0,0,0,1,1},
+    {1,1,1,1,1,0,0,0,1,1,0,0,0,1},
+    {0,0,0,1,1,0,1,1,0,0,0,0,0,1},
+    {1,1,1,0,0,0,0,0,0,1,1,1,1,1},
+    {0,0,1,1,1,0,0,0,0,0,0,0,0,0},
+    {0,0,1,1,1,1,1,1,1,1,1,1,1,1},
+    
+};
+
+int soln[7][14];
+void printsoln()
+{
+    int x1,y1;
+    for(x1=0;x1<7;x1++)
+    {
+        for(y1=0;y1<14;y1++)
+        {
+            printf("%d\t",soln[x1][y1]);
+            //if(soln[x1][y1]==1)
+            //printf("(%d,%d)",x1,y1);
+        }
+        printf("\n\n");
+    }
+}
+
+void coordinate_path ()
+{
+    int x1,y1;
+    for(x1=0;x1<7;x1++)
+    {
+        for(y1=0;y1<14;y1++)
+        {
+            if(soln[x1][y1]==1)
+            printf(" (%d,%d)",x1,y1);
+        }
+    }
+}
+
+
+int solvemaze(int a, int b)
+{
+    
+    if((a==5) && (b==13))
+    {
+        soln[a][b] = 1;
+        return 1;
+    }
+    
+    if(a>=0 && b>=0 && a<7 && b<14 && soln[a][b] == 0 && maze[a][b] == 0)
+    {
+        soln[a][b] = 1;
+        if(solvemaze(a+1, b))
+            return 1;
+        if(solvemaze(a, b+1))
+            return 1;
+        //going up
+        if(solvemaze(a-1, b))
+            return 1;
+        if(solvemaze(a, b-1))
+            return 1;
+        soln[a][b] = 0;
+        return 0;
+    }
+    return 0;
+
+}
+
+int main()
+{
+    int x1,y1;
+    for(x1=1; x1<7; x1++)
+    {
+        for(y1=0; y1<14; y1++)
+        {
+            soln[x1][y1] = 0;
+        }
+    }
+    if (solvemaze(1,0))
+        {coordinate_path ();
+          printsoln();
+          printf("\n");
+           }
+    else
+        printf("ERROR\n");
+    return 0;
+}
