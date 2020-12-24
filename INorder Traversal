@@ -1,0 +1,144 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct tree
+{
+int number;
+struct tree *left_chld;
+struct tree *right_chld;
+} node;
+
+node *root = NULL;
+void insertNode(int value);
+void inorder_trav(node *root);
+node * findMinimum(node *root);
+node * deleteNode(node *root, int value);
+
+int main()
+{
+//Create a tree using: 40, 28, 72, 15, 55, 36, 20, 4
+
+insertNode(40);
+insertNode(28);
+insertNode(72);
+insertNode(15);
+insertNode(55);
+insertNode(36);
+insertNode(20);
+insertNode(4);
+printf("\nInorder Tree printing:\n");
+inorder_trav(root);
+    printf("\n\n\n");
+
+
+//Delete 20, 15, 28 in order  from tree
+    
+root = deleteNode(root, 20);
+printf("\nInorder traversal after deletion:\n");
+inorder_trav(root);
+    printf("\n\n\n");
+
+root = deleteNode(root, 15);
+printf("\nInorder traversal after deletion:\n");
+inorder_trav(root);
+    printf("\n\n\n");
+
+root = deleteNode(root, 28);
+printf("\nInorder traversal after deletion:\n");
+inorder_trav(root);
+    printf("\n\n\n");
+
+printf("\n");
+return 0;
+}
+
+
+node * deleteNode(node *currentNode, int value)
+{
+if(currentNode==NULL) // case for deleting leaf node
+return NULL;
+else if(value < currentNode->number)
+        currentNode->left_chld = deleteNode(currentNode->left_chld, value);
+else if(value > currentNode->number)
+        currentNode->right_chld = deleteNode(currentNode->right_chld, value);
+
+else
+{
+//case for deleting node with one child
+if(currentNode->left_chld == NULL && currentNode->right_chld == NULL)
+        {
+            currentNode = NULL;
+        }
+else if(currentNode->left_chld == NULL)
+        {
+            currentNode = currentNode->right_chld;
+        }
+else if(currentNode->right_chld == NULL)
+        {
+            currentNode = currentNode->left_chld;
+        }
+else
+{//case for deleting node with two children
+            node *tempNode = findMinimum(currentNode->right_chld);
+            currentNode->number = tempNode->number;
+            currentNode->right_chld = deleteNode(currentNode->right_chld, tempNode->number);
+        }
+    }
+return currentNode;
+}
+node * findMinimum(node *currentNode)
+{
+if(currentNode->left_chld==NULL)
+return currentNode;
+return findMinimum(currentNode->left_chld);
+}
+void insertNode(int value)
+{
+    node *tempNode;
+    node *currentNode;
+    node *parentNode;
+    tempNode = (node *) malloc(sizeof(node));
+    tempNode->number = value;
+    tempNode->left_chld = NULL;
+    tempNode->right_chld = NULL;
+
+if(root==NULL)
+    {
+        root = tempNode;
+    }
+else
+    {
+        currentNode = root;
+        parentNode = NULL;
+while(1)
+        {
+            parentNode = currentNode;
+if(value <= parentNode->number)
+            {
+                currentNode = currentNode->left_chld;
+if(currentNode==NULL)
+                {
+                    parentNode->left_chld = tempNode;
+return;
+                }
+            }
+else
+            {
+                currentNode = currentNode->right_chld;
+if(currentNode==NULL)
+                {
+                    parentNode->right_chld = tempNode;
+return;
+                }
+            }
+        }
+    }
+}
+void inorder_trav(node *root)
+{
+if(root==NULL)
+return;
+inorder_trav(root->left_chld);
+printf("%d ", root->number);
+inorder_trav(root->right_chld);
+}
