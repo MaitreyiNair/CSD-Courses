@@ -1,0 +1,81 @@
+
+//
+//  main.c
+//  ASS2
+//
+//  Created by MAITREYI NAIR on 02/11/20.
+//
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* a student record */
+typedef struct _student {
+           /* student Reg_Date */
+    char       fname[100];
+    char       lname[100];
+    int        Reg_Date;
+         /* student's S_No */
+} student;
+
+/* linked list type with student record */
+
+
+struct _node {
+      student k;
+     struct _node *prev;
+    struct _node *next;
+ } node, *i;
+
+
+student* fileReader(FILE *file){
+    struct _node *i = malloc(sizeof(node));
+    int fileRead = fscanf(file,"%d");
+    if(fileRead != EOF){
+        printf("%s\n",i->k.fname);
+        printf("%s\n",i->k.lname);
+        printf("%d\n",i->k.Reg_Date);
+
+
+        i->next = fileReader(file);
+    }
+    else {
+        return NULL;
+    }
+    return i;
+    
+}
+    
+    
+    int main()
+        
+        
+    {
+    
+        
+           FILE *fp;
+           char ch;
+         
+           fp = fopen("TRIP1","r");
+         
+           if(fp ==  NULL)
+           {
+               printf("File not found. \n");
+           }
+           else
+           {
+               printf("File is opening..... \n\n");
+               while((ch = fgetc(fp)) != EOF )
+               {
+                   printf("%c", ch);
+               }
+            }
+         
+            fclose(fp);
+         
+            return 0;
+        
+
+
+    }
