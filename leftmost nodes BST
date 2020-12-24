@@ -1,0 +1,52 @@
+
+//
+//  Created by MAITREYI NAIR on 31/10/20.
+//
+
+#include <stdio.h>
+#include <stdlib.h>
+int sum = 0;
+struct node {
+   int data;
+   struct node *left_child, *right_child;
+};
+struct node* insert(int insert_data) {
+   struct node* temp = (struct node*)malloc(sizeof(struct node));
+   
+   temp->data = insert_data;
+   temp->left_child = temp->right_child = NULL;
+   return temp;
+}
+void left_child_view(struct node* root, int level, int* highest_level) {
+   if (root == NULL)
+   return;
+   
+   if (*highest_level < level) {
+      printf("%d\t", root->data);
+      *highest_level = level;
+       sum = root->data + sum;
+   }
+   left_child_view(root->left_child, level + 1, highest_level);
+   left_child_view(root->right_child, level + 1, highest_level);
+}
+void left_child(struct node* root) {
+   int highest_level = 0;
+   left_child_view(root, 1, &highest_level);
+}
+int main() {
+   printf("left_child view of a binary tree: ");
+   struct node* root = insert(1);
+   root->left_child = insert(2);
+   root->right_child = insert(3);
+   root->left_child->right_child->right_child = insert(5);
+   root->left_child->right_child = insert(4);
+    root->left_child->right_child->right_child->right_child = insert(6);
+    left_child(root);
+    printf("\n\n\n");
+    printf("Sum of left_childview of nodes: ");
+
+    printf("%d", sum);
+       return 0;
+}
+
+
