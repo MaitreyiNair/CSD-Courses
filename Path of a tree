@@ -1,0 +1,150 @@
+//
+//  main.c
+//  GRADED_LAB
+//
+//  CREATED by MAITREYI NAIR on 27/11/20.
+//  GRADED LAB - CSD201
+
+//  Q Given the root node of a tree, write a program to find the longest path from root to a leaf.
+
+// we'll use recusrsion to get the longest path
+
+// As the height of the tree is defined as the largest path from the root to a leaf, we can recursively compute the height of the left_childand right_child sub-trees.
+
+// basically our approach in this problem should be two fold
+// i to calculate the height of the tree
+// ii to print the path that was followed by the tree while calculating the height of the tree
+// ii a) we'll be considering an array/ stack to push the elemts that were visited by the tree
+// ii b) finally we'll create a void fn to print the path
+
+// the code is used to check the height of any generic tree
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node
+{
+    int data;
+    struct node* left_child, *right_child;
+};
+
+//Fn to insert new nodes
+
+
+struct node* insertnode(int key)
+{
+    struct node* newnode = (struct node*)malloc(sizeof(struct node));
+    newnode->data = key;
+    newnode->left_child= NULL;
+    newnode->right_child = NULL;
+
+    return(newnode);
+}
+
+//Fn to find the height of a Tree
+
+
+int heightoftree(struct node* root)
+{
+    int max;
+
+    if (root!=NULL)
+    {
+        // we are finding height of left and right sub tree and finally will compare it
+        int leftsubtree = heightoftree(root->left_child);
+
+        int rightsubtree = heightoftree(root->right_child);
+        if (leftsubtree > rightsubtree)
+        {
+            max = leftsubtree + 1;
+            return max;
+        }
+        else
+        {
+            max = rightsubtree + 1;
+            return max;
+        }
+
+    }
+
+    return 0;
+
+}
+
+/* void printArray(int ints[], int heightoftree)
+{
+    int i;
+    for (i = 0; i < heightoftree; i++)
+    {
+        printf("%d", i);
+    }
+   
+}
+
+ void printLongestPath(struct node* node, int arr, int counter, int h){
+        if(node==NULL) {
+            return;
+        
+        printLongestPath(node->left_child , arr, counter, h);
+        printLongestPath(node->right_child, arr, counter, h);
+
+    }
+
+        
+
+*/
+int main()
+{
+        int arr[10];
+        int counter=0;
+    struct node *newnode = insertnode(36);
+    newnode->left_child= insertnode(45);
+    newnode->right_child = insertnode(57);
+    newnode->left_child->left_child= insertnode(13);
+    newnode->left_child->right_child = insertnode(86);
+    newnode->right_child->left_child= insertnode(13);
+    newnode->right_child->right_child = insertnode(53);
+    newnode->right_child->right_child->right_child = insertnode(99);
+    int h = heightoftree(newnode);
+    //printArray(newnode, arr, counter, h);
+
+    // Sample Tree 1
+
+ /*
+                    36
+                  /    \
+                 45     57
+                / \     / \
+              13  86   13 53
+                            \
+                            99
+  */
+    printf("Height of the first Tree is\t%d\n",heightoftree(newnode));
+
+        int arr1[10];
+        int counter1=0;
+    struct node *node = insertnode(1);
+    node->right_child = insertnode(2);
+    node->right_child->right_child = insertnode(3);
+    node->right_child->right_child->right_child = insertnode(4);
+    node->right_child->right_child->right_child->left_child = insertnode(5);
+    int h1 = heightoftree(node);
+    //printLongestPath(node, arr1, counter1, h1);
+
+    // Sample Tree 2
+ /*
+                    1
+                     \
+                      2
+                       \
+                        3
+                         \
+                          4
+                          /
+                        5
+    */
+
+    printf("\nHeight of the second Tree is\t%d\n",heightoftree(node));
+
+    return 0;
+}
