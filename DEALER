@@ -1,0 +1,205 @@
+//
+//  main.c
+//  Assignment
+//
+//  Created by MAITREYI NAIR on 28/10/20.
+//
+
+#include<stdio.h>
+typedef struct
+    {
+        int ID; int stock;int sales;
+    }Dealer;
+
+int main()
+{
+    FILE *pt;
+    int i;
+
+if((pt = fopen("AUTOZEE.txt", "r")) == NULL)
+{
+        printf("FILE IS NOT OPENING");
+    }
+
+      
+
+    int n, M;
+    fscanf(pt,"%d",&n);
+    printf("\n");
+
+    if(n>40)
+    {
+        printf("Please enter a number less than 40\n");
+        
+    }
+
+    Dealer deal[n];
+
+    for(i=0;i<n;i++)
+    {
+        fscanf(pt,"%d",&deal[i].ID);
+    }
+    
+    printf("\n");
+    
+    for(i=0;i<n;i++)
+    {
+        fscanf(pt,"%d",&deal[i].stock);
+    }
+    
+    printf("\n");
+    
+    for(i=0;i<n;i++)
+    {
+        fscanf(pt,"%d",&deal[i].sales);
+    }
+
+    fscanf(pt,"%d",&M);
+    
+    
+    printf("\n");
+    printf("ID->\t");
+    for(i=0;((i<n)&&(i<10));i++)
+    {
+        printf("%d\t",deal[i].ID);
+    }
+    
+    printf("\n");
+    printf("Stock->  ");
+    for(i=0;((i<n)&&(i<10));i++)
+    {
+        printf("%d\t",deal[i].stock);
+    }
+    
+    printf("\n");
+    printf("Sales->  ");
+    for(i=0;((i<n)&&(i<10));i++)
+    {
+        printf("%d\t",deal[i].sales);
+    }
+    
+    printf("\n");
+
+
+int ind=0;
+for(i=0;i<n;i++)
+{
+    if(deal[i].ID==M)
+    ind=i;
+}
+printf("\n\n");
+
+for(i=ind;i<n-1;i++)
+{
+    deal[i].ID=deal[i+1].ID;
+}
+deal[n-1].ID=70;
+
+for(i=ind;i<n-1;i++)
+{
+    deal[i].stock=deal[i+1].stock;
+}
+deal[n-1].stock=80;
+
+for(i=ind;i<n-1;i++)
+{
+    deal[i].sales=deal[i+1].sales;
+}
+deal[n-1].sales=90;
+
+printf("\n\n");
+printf("ID->\t");
+for(i=0;i<n;i++)
+    {
+        printf("%d\t",deal[i].ID);
+    }
+
+printf("\n");
+printf("Stock->  ");
+for(i=0;i<n;i++)
+    {
+        printf("%d\t",deal[i].stock);
+    }
+
+printf("\n");
+printf("Sales->  ");
+for(i=0;i<n;i++)
+    {
+        printf("%d\t",deal[i].sales);
+    }
+printf("\n\n");
+
+int new[3];
+for(i=0;i<3;i++)
+{
+    fscanf(pt,"%d",&new[i]);
+}
+fclose(pt);
+
+printf("\n");
+
+    
+    
+n=n+1;
+deal[n-1].ID=90;
+deal[n-2].ID=new[0];
+int key,j;
+
+    for(j=1;j<=n-2;j++)
+    {
+        key=deal[j].ID;
+        i=j-1;
+        while(i>=0&&deal[i].ID>key)
+        {
+            deal[i+1].ID=deal[i].ID;
+            i--;
+        }
+        deal[i+1].ID=key;
+    }
+
+ind=0;
+for(i=0;i<n;i++)
+{
+    if(deal[i].ID==new[0])
+    ind=i;
+}
+
+
+for(i=n-1;i>ind;i--)
+{
+    deal[i].stock=deal[i-1].stock;
+}
+deal[ind].stock=new[1];
+
+for(i=n-1;i>ind;i--)
+{
+    deal[i].sales=deal[i-1].sales;
+}
+deal[ind].sales=new[2];
+
+
+printf("\n\n");
+printf("ID->\t");
+for(i=0;i<n-1;i++)
+    {
+        printf("%d\t",deal[i].ID);
+    }
+
+
+printf("\n");
+printf("Stock->  ");
+for(i=0;i<n-1;i++)
+    {
+        printf("%d\t",deal[i].stock);
+    }
+
+printf("\n");
+printf("Sales->  ");
+for(i=0;i<n-1;i++)
+    {
+        printf("%d\t",deal[i].sales);
+    }
+printf("\n\n");
+
+return 0;
+}
