@@ -1,0 +1,80 @@
+//
+//  main.c
+//  LAB_ASS2
+//
+//  Created by MAITREYI NAIR on 23/09/20.
+//
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node
+{
+    char Name;
+    int Reg_No;
+    struct node *next;
+};
+
+display(struct node *head)
+{
+    if(head == NULL)
+    {
+        printf("NULL\n");
+    }
+    else
+    {
+        printf("%c %d\n", head -> Name,Reg_No);
+        display(head->next);
+    }
+}
+
+void concatenate(struct node *BOOKING,struct node *WAITING)
+{
+    if( BOOKING != NULL && WAITING != NULL )
+    {
+        if (BOOKING->next == NULL)
+            BOOKING->next = WAITING;
+        else
+            concatenate(BOOKING->next,WAITING);
+    }
+    else
+    {
+        printf("Either BOOKING or WAITING is NULL\n");
+    }
+}
+
+int main()
+{
+    struct node *prev,*BOOKING, *WAITING, *p;
+    int n,i;
+    printf ("number of elements in a:");
+    scanf("%d",&n);
+    BOOKING=NULL;
+    for(i=0;i<n;i++)
+    {
+        p=calloc(char, (sizeof(struct node)));
+        scanf("%c %d",&p->Reg_No);
+        p->next=NULL;
+        if(BOOKING==NULL)
+            BOOKING=p;
+        else
+            prev->next=p;
+        prev=p;
+    }
+    printf ("number of elements in WAITING:");
+    scanf("%d",&n);
+    WAITING=NULL;
+    for(i=0;i<n;i++)
+    {
+        p=calloc(char, (sizeof(struct node)));
+        scanf("%c %d",&p->Reg_No);
+        p->next=NULL;
+        if(WAITING==NULL)
+            WAITING=p;
+        else
+            prev->next=p;
+        prev=p;
+    }
+    concatenate(BOOKING,WAITING);
+    return 0;
+}
