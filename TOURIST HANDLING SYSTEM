@@ -1,0 +1,400 @@
+//
+//  main.c
+//  Assignment_1910110220_2
+//
+//  Created by MAITREYI NAIR on 03/11/20.
+//
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include <string.h>
+
+
+#define OPCODE_BOOK_TOURIST         1
+#define OPCODE_CANCEL_BOOKING       2
+#define OPCODE_PRINT_BOOKINGLIST    3
+#define OPCODE_PRINT_TRIP_LIST      4
+#define OPCODE_PRINT_WAITING_LIST   8
+
+/* a Booking record */
+typedef struct _BOOKING {
+    /* Booking Reg_Date */
+    char*       fname;
+    char*       lname;
+    int        Reg_Date;
+    /* Booking's S_No */
+} booking;
+
+/* linked list type with Booking record */
+
+
+typedef struct _node {
+    booking *b;
+    struct _node *next;
+} node;
+
+/*Booking *create_Booking_node(Booking proc)
+ {
+ Booking *k = create_Booking_node(proc);
+ Booking *k = malloc(sizeof *k);
+ if (k == NULL)
+ {
+ perror("Failed to allocate new node: ");
+ exit(EXIT_FAILURE);
+ }
+ k->k = proc;
+ k->next = NULL;
+ return k;
+ }
+ 
+ Booking proc = {{'a', 'b'},{'a', 'b'}, 0};*/
+
+node* TRIP          = NULL;
+node* WAITLIST      = NULL;
+node* BOOKING       = NULL;
+
+int max_no_of_pass = -1;
+
+
+
+node* createBookingNode(char* firstName,char* lastName,int date)
+{
+    node *n = (node*)(malloc(sizeof(node)));
+    n->b = (booking*)(malloc(sizeof(booking)));
+    n->next = NULL;
+    
+    
+    n->b->fname = (char*)malloc(strlen(firstName)+1);
+    strcpy(n->b->fname, firstName);
+    n->b->fname[strlen(firstName)] = '\0';
+
+    n->b->lname = (char*)malloc(strlen(lastName)+1);
+    strcpy(n->b->lname, lastName);
+    n->b->lname[strlen(lastName)] = '\0';
+    
+    n->b->Reg_Date = date;
+    
+    return n;
+}
+
+node* searchNode_booking(char* firstname, char* lastname)
+{
+    node* n = NULL;
+    if(BOOKING != NULL)
+    {
+        node* currentNode = BOOKING;
+        while(currentNode != NULL)
+        {
+            if(strcmp(firstname,currentNode->b->fname) == 0
+            && strcmp(lastname,currentNode->b->lname) == 0)
+                return currentNode;
+            
+            currentNode = currentNode->next;
+        }
+    }
+    
+    return n;
+}
+
+void addnode_bookinglist(node* booking)
+{
+    if(BOOKING == NULL)
+    {
+        BOOKING = booking;
+        return;
+    }
+    
+    node* startPrt = BOOKING;
+    while(startPrt->next != NULL)
+        startPrt = startPrt->next;
+    
+    // after this loop the startPtr will be pointing to the last element
+    // add the incoming node after startPtr
+    
+    startPrt->next = booking;
+}
+
+
+int numberOfSlotAvailableForTrip()
+{
+    // check the count in trip list and compare with max_no_of_pass
+    int count = 0;
+    node* startPtr = TRIP;
+    while(startPtr != NULL)
+    {
+        count++;
+        startPtr = startPtr->next;
+    }
+    
+    return max_no_of_pass - count;
+}
+
+void addnode_trip(node* booking)
+{
+    if(TRIP == NULL)
+    {
+        TRIP = booking;
+        return;
+    }
+    
+    node* previousPtr = NULL;
+    node* currentPtr = TRIP;
+    
+    while(currentPtr != NULL && currentPtr->b->Reg_Date < booking->b->Reg_Date)
+    {
+        previousPtr = currentPtr;
+        currentPtr = currentPtr->next;
+    }
+    
+    // lets insert this in order now. either the currentPtr is at last or the current pointer has a reg date higher than the new booking reg date.
+    previousPtr->next = booking;
+    booking->next = currentPtr;
+}
+
+
+// for waiting list we will simply add this to the end.
+// Big believer in FIFO - First In First Out
+void addnode_waitinglist(node* booking)
+{
+    if(WAITLIST == NULL)
+    {
+        WAITLIST = booking;
+        return;
+    }
+    
+    node* startPrt = WAITLIST;
+    while(startPrt->next != NULL)
+        startPrt = startPrt->next;
+    
+    // after this loop the startPtr will be pointing to the last element
+    // add the incoming node after startPtr
+    
+    startPrt->next = booking;
+}
+
+//0 for success, -1 if the booking exists
+int addBooking(char* firstName,char* lastName,int date)
+{
+    int result = -1;
+    // First check if this booking exits already. check with fname, lname
+    node* existingBooking = searchNode_booking(firstName, lastName);
+    if(existingBooking == NULL)
+    {
+        result = 0;
+        // booking doesnt exists. lets do the following:-
+        
+        //0. create a booking
+        node* newBooking = createBookingNode(firstName, lastName, date);
+        
+        // 1. insert this node in booking list
+        addnode_bookinglist(newBooking);
+        
+        // 2. check and insert this node in either trip or waiting list.
+        if(numberOfSlotAvailableForTrip() > 0)
+        {
+            // put it in TRIP list - in order
+            newBooking = createBookingNode(firstName, lastName, date);
+            addnode_trip(newBooking);
+        }
+        else{
+            newBooking = createBookingNode(firstName, lastName, date);
+            addnode_waitinglist(newBooking);
+        }
+    }
+    return result;
+}
+
+
+void removenode_list(node* LIST, node* booking)
+{
+    // we have passed the LIST from outside to make this function generic.
+    if(LIST == NULL)
+        return;
+    
+    if((strcmp(booking->b->fname,LIST->b->fname) == 0
+        && strcmp(booking->b->lname,LIST->b->lname) == 0))
+    {
+        LIST = TRIP->next;
+        return;
+    }
+    
+    node* previousPtr = NULL;
+    node* currentPtr = LIST;
+    
+    while(currentPtr != NULL
+    && !((strcmp(booking->b->fname,currentPtr->b->fname) == 0
+         && strcmp(booking->b->lname,currentPtr->b->lname) == 0)))
+    {
+        previousPtr = currentPtr;
+        currentPtr = currentPtr->next;
+    }
+    
+    // if the current pointer is not null, it means that we have found the node.
+    // if its null at the end of while loop, that means we coulnd find the node, so do nothing
+    if(currentPtr != NULL)
+    {
+        previousPtr->next = currentPtr->next;
+        free(currentPtr);
+    }
+}
+
+
+
+node* get_next_waitinglist()
+{
+    if(WAITLIST == NULL)
+        return WAITLIST;
+    
+    node* nextInLineNode = WAITLIST;
+    WAITLIST = WAITLIST->next;
+    
+    return nextInLineNode;
+}
+
+int cancelBooking(char* firstName,char* lastName)
+{
+    
+    // In order to cancel booking first check if this booking exists in BOOKING list of not
+    node* existingBooking = searchNode_booking(firstName, lastName);
+    // create a new booking here since the removennode_list function also deletes the node
+    existingBooking = createBookingNode(existingBooking->b->fname, existingBooking->b->lname, existingBooking->b->Reg_Date);
+    
+    if(existingBooking == NULL)
+    {
+        // The booking doesnt exits. return error status
+        printf("Booking doesnt exists for %s, %s \n",firstName, lastName);
+        return -1;
+    }
+    
+    // existing booking found. Now lets remove it from all the lists. efter removing it from all the lists, we also need to free the memory being held by this poiter
+    removenode_list(TRIP, existingBooking);
+    removenode_list(WAITLIST, existingBooking);
+    removenode_list(BOOKING, existingBooking);
+    free(existingBooking);
+    
+    // Now check if there is extra vacancy in TRIP. If yes then take a node from WAITING and move it to TRIP
+    if(numberOfSlotAvailableForTrip() > 0)
+    {
+        node* nextBooking = get_next_waitinglist();
+        if(nextBooking != NULL)
+        {
+            addnode_trip(nextBooking);
+            removenode_list(WAITLIST, nextBooking);
+        }
+    }
+
+    return 0;
+}
+
+int No_ofBooking()
+{
+    return max_no_of_pass;
+}
+
+void print_list(char* listName, node* LIST)
+{
+    node* startPtr = LIST;
+    
+    printf("%s", listName);
+    
+    while(startPtr != NULL)
+    {
+        printf("\t%d, %s, %s", startPtr->b->Reg_Date, startPtr->b->fname, startPtr->b->lname);
+        startPtr = startPtr->next;
+    }
+    
+    printf("\n\n");
+}
+
+void getRowValues(char* row, char** opCode, char** fName, char** lName, char** orderDate)
+{
+    char *token = strtok(row, " ");
+    
+    if(NULL != token)
+        *opCode = token;
+    
+    token = strtok(NULL, " ");
+    if(NULL != token)
+        *fName = token;
+    
+    token = strtok(NULL, " ");
+    if(NULL != token)
+        *lName = token;
+    
+    token = strtok(NULL, " ");
+    if(NULL != token)
+        *orderDate = token;
+    
+    
+    char *pos;
+    if ((pos=strchr(*fName, '\n')) != NULL)
+        *pos = '\0';
+    
+    // stripo out \n from the end
+    if ((pos=strchr(*lName, '\n')) != NULL)
+        *pos = '\0';
+    
+    
+}
+
+
+
+int main()
+{
+    /* should check that argc > 1 */
+    FILE* file = fopen("File", "r");/* should check the result */
+    
+    
+    char line[256];
+    char *ptr = line;
+    
+    
+    
+    
+    while (fgets(line, sizeof(line), file)) {
+        
+        
+        if(max_no_of_pass == -1)
+        {
+            max_no_of_pass = atoi(ptr);
+            //printf("%d",max_no_of_pass);
+            //printf("\n\n\n");
+            //puts("");
+            continue;
+        }
+        char *opCode, *fName, *lName, *orderDate;
+        getRowValues(line, &opCode, &fName, &lName, &orderDate);
+        
+        int operation = atoi(opCode);
+        
+        //printf( " %s\n", opCode );
+        //printf( " %s\n", fName );
+        //printf( " %s\n", lName );
+        //printf( " %s\n", orderDate );
+        
+        
+        switch(operation)
+        {
+            case OPCODE_BOOK_TOURIST:
+                addBooking(fName, lName, atoi(orderDate));
+                break;
+            case OPCODE_CANCEL_BOOKING:
+                cancelBooking(fName, lName);
+                break;
+            case OPCODE_PRINT_BOOKINGLIST:
+                print_list("BOOKING", BOOKING);
+                break;
+            case OPCODE_PRINT_WAITING_LIST:
+                print_list("WAITLIST", WAITLIST);
+                break;
+            case OPCODE_PRINT_TRIP_LIST:
+                print_list("TRIP", TRIP);
+                break;
+            default:
+                printf("ERROR! ILLEGAL OP CODE RECEIVED - %d \n", operation);
+        }
+    }
+    fclose(file);
+}
